@@ -1,0 +1,6 @@
+[0m[[0m[31merror[0m] [0m[0m/Users/carmen.pontes/projects/api-zipcode/src/main/scala/router/ZipCodeRouter.scala:16:85: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m found   : handler.ZipCodeHandler.ZipCodeResponse.type[0m
+[0m[[0m[31merror[0m] [0m[0m required: (?, ?, ?, ?, ?, ?, ?, ?) => handler.ZipCodeHandler.ZipCodeResponse[0m
+[0m[[0m[31merror[0m] [0m[0m  implicit val zipCodeResponseFormat: RootJsonFormat[ZipCodeResponse] = jsonFormat8(ZipCodeResponse)[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                                    ^[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m
