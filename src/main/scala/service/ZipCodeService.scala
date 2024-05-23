@@ -2,17 +2,13 @@ package service
 
 import akka.actor.ActorSystem
 import handler.ZipCodeHandler
-import handler.ZipCodeHandler.ZipCodeResponse
+import handler.ZipCodeHandler.{UserRequest, UserResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
-
-class ZipCodeService (implicit system: ActorSystem, ec: ExecutionContext){
-  def getZipCode(zipcode: String): Future[Either[String, ZipCodeResponse]] = {
-    ZipCodeHandler.fetchZipCode(zipcode).map { zipCodeResponse =>
-      Right(zipCodeResponse)
-    }.recover {
-      case e: Throwable =>
-        Left(s"Zip code not found: ${e.getMessage}")
+class ZipCodeService(implicit system: ActorSystem, ec: ExecutionContext) {
+  def getUserResponse(userRequest: UserRequest): Future[UserResponse] = {
+    ZipCodeHandler.fetchZipCode(userRequest.cep).map { zipCodeResponse =>
+      ZipCodeHandler.createUserResponse(userRequest, zipCodeResponse)
     }
   }
 }

@@ -1,30 +1,26 @@
 package router
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import handler.ZipCodeHandler._
+import akka.http.scaladsl.server.Route
+import support.JsonFormats._
+import handler.ZipCodeHandler
 import service.ZipCodeService
-import spray.json.DefaultJsonProtocol._
-import spray.json.RootJsonFormat
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 
-object ZipCodeRouter extends SprayJsonSupport {
-
-  implicit val zipCodeRequestFormat: RootJsonFormat[ZipCodeRequest] = jsonFormat1(ZipCodeRequest)
-  implicit val zipCodeResponseFormat: RootJsonFormat[ZipCodeResponse] = jsonFormat10(ZipCodeResponse)
-
-  def route(zipCodeService: ZipCodeService)(implicit system: ActorSystem): Route = {
-    implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
-
-    get {
-      path("zipcode" / Segment) { zipcode =>
-          onSuccess(zipCodeService.getZipCode(zipcode)) {
-            case Right (zipCodeResponse) => complete(StatusCodes.OK, zipCodeResponse)
-            case Left(errorMessage) => complete(StatusCodes.NotFound, errorMessage)
+import scala.concurrent.ExecutionContext
+object ZipCodeRouter {
+  def route(zipCodeService: ZipCodeService)(implicit system: ActorSystem, ec: ExecutionContext): Route = {
+    path("zipcode")
+        post {
+          entity(as[ZipCodeHandler.UserRequest]) { userRequest =>
+            onComplete(zipCodeService.getUserResponse(userRequest)) {
+              case scala.util.Success(userResponse) =>
+                complete(userResponse)
+              case scala.util.Failure(ex) =>
+                complete(500, s"""{"error": "Error processing the request: ${ex.getMessage}"}""")
+            }
           }
         }
-      }
     }
   }

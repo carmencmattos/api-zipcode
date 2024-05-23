@@ -4,18 +4,24 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import router.ZipCodeRouter
 import service.ZipCodeService
-
-import scala.concurrent.ExecutionContext
-
+import org.slf4j.LoggerFactory
 object ZipCodeServer {
+  private val logger = LoggerFactory.getLogger(getClass)
   def main(args: Array[String]): Unit = {
     implicit val system: ActorSystem = ActorSystem("ZipCodeServer")
-    implicit val executionContext: ExecutionContext = system.dispatcher
+    implicit val executionContext = system.dispatcher
 
-    val zipCodeService = new ZipCodeService()(system, executionContext)
-    val bindingFuture = Http().newServerAt("localhost", 8080).bindFlow(ZipCodeRouter.route(zipCodeService)(system))
+    val zipCodeService = new ZipCodeService()
+    val routes = ZipCodeRouter.route(zipCodeService)
 
-    println(s"Server online at http://localhost:8080/")
+    val bindingFuture = Http().newServerAt("localhost", 8080).bind(routes)
+    logger.info(s"Server online at http://localhost:8080/")
 
+    sys.addShutdownHook{
+      bindingFuture
+        .flatMap(_.unbind())
+        .onComplete(_ => system.terminate())
+      logger.info("Server offline")
+    }
   }
 }
