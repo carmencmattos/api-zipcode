@@ -6,14 +6,12 @@ import akka.http.scaladsl.model.HttpRequest
 import spray.json._
 import support.JsonFormats._
 import org.slf4j.LoggerFactory
+import model.{ZipCodeResponse, UserRequest, UserResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 object ZipCodeHandler {
   private val logger = LoggerFactory.getLogger(getClass)
-  case class UserRequest(nome: String, contato: String, cep: String)
-  case class ZipCodeResponse(cep: String, logradouro: String, complemento: String, bairro: String, localidade: String, uf: String, ibge: String, gia: String, ddd: String, siafi: String)
-  case class UserResponse(nome: String, contato: String, cep: String, logradouro: String, complemento: String, bairro: String, localidade: String, uf: String, ibge: String, gia: String, ddd: String, siafi: String)
 
   def fetchZipCode(zipcode: String)(implicit system: ActorSystem, ec: ExecutionContext): Future[ZipCodeResponse] = {
     logger.debug(s"Fetching zip code $zipcode")

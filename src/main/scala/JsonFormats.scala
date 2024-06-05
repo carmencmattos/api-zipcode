@@ -2,7 +2,7 @@ package support
 
 import spray.json._
 import spray.json.DefaultJsonProtocol._
-import handler.ZipCodeHandler.{UserRequest, ZipCodeResponse, UserResponse}
+import model.{UserRequest, ZipCodeResponse, UserResponse}
 
 object JsonFormats {
   implicit val userRequestFormat: RootJsonFormat[UserRequest] = jsonFormat3(UserRequest)
